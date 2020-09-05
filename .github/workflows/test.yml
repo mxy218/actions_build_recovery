@@ -18,10 +18,27 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
-      - name: Run a one-line script
+      - name:  System info
         run: |
           free -h
           df -h
-          cat /proc/cpuinfo
+          nproc --all
+  
+      - name: Clean Up
+        run: |
+          docker rmi `docker images -q`
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/sudo apt/sources.list.d
+          sudo apt -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
+          sudo apt update
+          sudo apt -y autoremove --purge
+          sudo apt clean
+
+      # Runs a single command using the runners shell
+      - name:  System info
+        run: |
+          free -h
+          df -h
+          nproc --all
+          pwd
           
         
