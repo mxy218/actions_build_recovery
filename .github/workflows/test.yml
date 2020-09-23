@@ -23,6 +23,7 @@ jobs:
           free -h
           df -h
           nproc --all
+          dpkg -l
   
       - name: Clean Up
         run: |
