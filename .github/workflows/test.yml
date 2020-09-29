@@ -20,7 +20,6 @@ jobs:
       # Runs a single command using the runners shell
       - name:  System info
         run: |
-          free -h
           df -h
           nproc --all
           dpkg -l
@@ -34,10 +33,47 @@ jobs:
           sudo apt -y autoremove --purge
           sudo apt clean
 
+      - name: Update packages
+        run: |
+          sudo apt update
+          sudo apt full-upgrade
+
+      - name: Install required packages
+        run: sudo apt install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev tree lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc unzip jq
+
+      - name:  System info
+        run: |
+          df -h
+          
+      - name: Install Repo
+        run: |
+          mkdir ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+
+      - name: Initialize a Repo client
+        run: |
+          PATH=~/bin:$PATH
+          mkdir workspace
+          cd workspace
+          echo "::set-output name=pwd::$(pwd)"
+          git config --global user.name "${{ steps.var.outputs.git_username }}"
+          git config --global user.email "${{ steps.var.outputs.git_email }}"
+          repo init --depth=1 -u git://github.com/LineageOS/android.git -b lineage-17.1
+        id: pwd
+      
+      - name: Repo sync
+        run: |
+          PATH=~/bin:$PATH
+          cd workspace
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+          ls -al
+          du -sm .repo 
+          du -sm *
+        
       # Runs a single command using the runners shell
       - name:  System info
         run: |
-          free -h
           df -h
           nproc --all
           pwd
